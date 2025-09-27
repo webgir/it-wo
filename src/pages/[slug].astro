@@ -1,0 +1,46 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import BlogPost from "../layouts/BlogPost.astro";
+import { calculateReadingTimeFromHtml } from "../lib/reading";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: {
+      slug: ((post as any).slug ?? post.id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")
+    },
+    props: post,
+  }));
+}
+type Props = CollectionEntry<"blog">;
+
+const post = Astro.props as Props;
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+const currentSlug = ((post as any).slug ?? post.id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "");
+
+// соседи
+const sorted = posts.slice().sort((a, b) => +b.data.pubDate - +a.data.pubDate);
+const index = sorted.findIndex((p) => p.id === post.id);
+const prev = index < sorted.length - 1
+  ? { id: (((sorted[index + 1] as any).slug ?? sorted[index + 1].id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")), title: sorted[index + 1].data.title }
+  : null;
+const next = index > 0
+  ? { id: (((sorted[index - 1] as any).slug ?? sorted[index - 1].id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")), title: sorted[index - 1].data.title }
+  : null;
+
+const { Content } = await render(post);
+const html = await Astro.slots.render("default");
+const readingTimeMin = calculateReadingTimeFromHtml(html ?? "");
+
+const canonicalUrl = `/${currentSlug}/`;
+---
+<BlogPost
+  {...post.data}
+  prevPost={prev}
+  nextPost={next}
+  readingTimeMin={readingTimeMin}
+  canonicalUrl={canonicalUrl}
+>
+  <Content />
+</BlogPost>
