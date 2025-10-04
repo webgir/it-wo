@@ -1,27 +1,33 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
 import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
-const pageTitle = 'About Me';
-const pageDescription = 'Learn more about my background and approach to software engineering.';
+
+const pageTitle = 'Обо мне';
+const pageDescription = 'О цифровом ремесле, дизайне и системах, которые работают честно и красиво.';
 ---
 
 <Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
   <p>
-    Hey! I'm a senior software engineer who loves designing reliable systems and shipping products that feel great to use.
+    Меня зовут Sikeysipi. Я руководитель проектов в области информационных технологий, дизайнер и исследователь цифровых систем. 
+    Занимаюсь тем, что соединяю технологию и эстетику — от архитектуры сайтов и автоматизации до визуального оформления и структуры данных.
   </p>
+
   <p>
-    I work across the stack with TypeScript, Node.js, React/Next.js, and PostgreSQL. I care deeply about readable code,
-    strong tests, and observability. My approach: ship small, iterate quickly, measure outcomes.
+    Мне близок инженерный подход: ясность, повторяемость, логика.  
+    И при этом я не верю в бездушный код — важно, чтобы каждый проект имел ритм, характер и ощущение завершённости.  
+    Иногда это документация, иногда интерфейс, иногда просто тишина между строками кода.
   </p>
+
   <p>
-    Recent highlights include leading a migration from a monolith to well‑scoped services, improving p95 latency,
-    and introducing CI/CD with preview environments and quality gates.
+    Работая с командами и клиентами, я стараюсь выстраивать процессы, где дизайн и разработка не противостоят друг другу, 
+    а образуют цельную систему. Мне интересны платформы, которые живут долго, выдерживают нагрузку и не теряют лицо.
   </p>
+
   <p>
-    Outside of feature work, I enjoy mentoring, documentation, and building design‑system components that make teams faster.
-    Always learning—and always happy to collaborate on meaningful problems.
+    В свободное время я экспериментирую с нейросетями, цифровым искусством и идеей того, 
+    как машина может помочь человеку увидеть привычное под новым углом.  
+    Это не хобби — скорее способ исследовать границы восприятия и инструменты будущего.
   </p>
 
   <GlowLineSeparator />
-
 </Layout>

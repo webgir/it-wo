@@ -11,11 +11,11 @@ export const workIcons = {
 
 export const work = [
   {
-    title: "Senior Software Engineer",
+    title: "Ведущий инженер-разработчик",
     company: "Acme Cloud",
-    region: "United States",
+    region: "США",
     description:
-      "Led the design and delivery of a multi‑tenant platform, decomposed critical monolith paths into services, improved p95 latency by 40%, defined SLOs and on‑call rotations, and mentored junior engineers.",
+      "Руководил проектированием и внедрением мультиарендной платформы, разбил монолит на сервисы, сократил p95-задержку на 40 %, определил SLO и дежурства, наставлял младших инженеров.",
     technologies: [
       "TypeScript",
       "Node.js",
@@ -30,11 +30,11 @@ export const work = [
     ],
   },
   {
-    title: "Staff Software Engineer",
+    title: "Ведущий инженер (Staff Software Engineer)",
     company: "FinchPay",
-    region: "Global",
+    region: "Глобально",
     description:
-      "Architected event‑driven payment services with idempotency and retries, introduced Kafka for async processing, enforced API versioning, and drove observability with structured logging and tracing.",
+      "Разработал событийно-ориентированные платёжные сервисы с идемпотентностью и повторными попытками, внедрил Kafka для асинхронной обработки, реализовал версионирование API и систему наблюдаемости с логированием и трассировкой.",
     technologies: [
       "TypeScript",
       "NestJS",
@@ -47,11 +47,11 @@ export const work = [
     ],
   },
   {
-    title: "Senior Frontend Engineer",
+    title: "Старший фронтенд-инженер",
     company: "Insight Analytics",
-    region: "Europe",
+    region: "Европа",
     description:
-      "Owned the design system and SSR/ISR strategy, improved Core Web Vitals (LCP/INP) into the green, and shipped accessible UI components with strong tests and story coverage.",
+      "Отвечал за дизайн-систему и стратегию SSR/ISR, улучшил показатели Core Web Vitals (LCP/INP) до зелёных зон, создал доступные UI-компоненты с тестами и Storybook-покрытием.",
     technologies: [
       "React",
       "Next.js",
@@ -62,11 +62,11 @@ export const work = [
     ],
   },
   {
-    title: "Software Engineer",
+    title: "Инженер-разработчик",
     company: "LaunchPad",
-    region: "Brazil",
+    region: "Бразилия",
     description:
-      "Built MVPs end‑to‑end: designed REST/GraphQL APIs, set up CI/CD with preview environments, introduced feature flags, and migrated data to Postgres.",
+      "Создавал MVP-продукты под ключ: проектировал REST/GraphQL API, настроил CI/CD с предпросмотрами, внедрил feature-флаги и мигрировал данные в Postgres.",
     technologies: [
       "Node.js",
       "Express",
@@ -80,4 +80,3 @@ export const work = [
 ];
 
 export type WorkItem = (typeof work)[number];
-

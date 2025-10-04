@@ -1,15 +1,14 @@
 ---
-// Import the global.css file here so that it is included on
-// all pages through the use of the <BaseHead /> component.
+// Глобальное подключение стилей, чтобы применялось ко всем страницам через <BaseHead />.
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
 import FallbackImage from '../assets/images/blog-placeholder-1.jpg';
 import { SITE_TITLE } from '../consts';
 
 interface Props {
-	title: string;
-	description: string;
-	image?: ImageMetadata;
+  title: string;
+  description: string;
+  image?: ImageMetadata;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -20,7 +19,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 const imageUrl = new URL(image.src, siteOrigin).toString();
 ---
 
-<!-- Global Metadata -->
+<!-- Глобальные метаданные -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=1" />
@@ -30,28 +29,28 @@ const imageUrl = new URL(image.src, siteOrigin).toString();
 <link rel="shortcut icon" href="/favicon.ico?v=1" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
-	rel="alternate"
-	type="application/rss+xml"
-	title={SITE_TITLE}
-	href={new URL('rss.xml', Astro.site)}
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE_TITLE}
+  href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Font preloads -->
+<!-- Предзагрузка шрифтов -->
 <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
 <link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
 
-<!-- Canonical URL -->
+<!-- Канонический URL -->
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Robots -->
+<!-- Роботы -->
 <meta name="robots" content="index,follow,max-image-preview:large" />
 
-<!-- Theme color (supports dark/light) -->
+<!-- Цвет темы (для светлой и тёмной схемы) -->
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0b0b" />
 
-<!-- Primary Meta Tags -->
+<!-- Основные мета-теги -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
@@ -59,7 +58,7 @@ const imageUrl = new URL(image.src, siteOrigin).toString();
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={SITE_TITLE} />
-<meta property="og:locale" content="en_US" />
+<meta property="og:locale" content="ru_RU" />
 <meta property="og:url" content={absoluteUrl} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />

@@ -5,53 +5,52 @@ import PosthogIcon from '../assets/logos/posthog-logo.svg?raw';
 import PythonIcon from '../assets/logos/Python-logo.svg?raw';
 import TailwindIcon from '../assets/logos/Tailwind-logo.svg?raw';
 
-
 export const projects = [
 	{
-		title: "Workflow Automation Orchestrator (n8n)",
+		title: "Оркестратор автоматизации рабочих процессов (n8n)",
 		techStack: "n8n • Node.js • TypeScript • PostgreSQL",
-		description: "Event‑driven workflows for data sync, notifications, and back‑office automation. Custom nodes, secrets management, retries, and metrics.",
-		ctaText: "View Repo →",
+		description: "Событийно-ориентированные сценарии для синхронизации данных, уведомлений и автоматизации внутренних процессов. Кастомные узлы, управление секретами, повторные попытки и метрики.",
+		ctaText: "Посмотреть репозиторий →",
 		ctaLink: "#",
 		icon: N8nIcon
 	},
 	{
-		title: "SaaS API Starter (Auth, Billing, RBAC)",
+		title: "SaaS API-стартер (Авторизация, Биллинг, RBAC)",
 		techStack: "Node.js • TypeScript • PostgreSQL • Supabase • Stripe",
-		description: "Production‑ready REST/GraphQL API with JWT auth, role‑based access, Stripe subscriptions, and rate‑limited endpoints.",
-		ctaText: "Get Source < / >",
+		description: "Готовый к продакшену REST/GraphQL API с JWT-аутентификацией, ролевым доступом, подписками через Stripe и ограничением частоты запросов.",
+		ctaText: "Получить исходники < / >",
 		ctaLink: "#",
 		icon: SupabaseIcon
 	},
 	{
-		title: "Realtime Chat Service",
+		title: "Сервис чата в реальном времени",
 		techStack: "Phoenix • WebSockets • Redis • Docker",
-		description: "Low‑latency chat with channels, presence, and backpressure handling. Includes load tests and horizontal scaling notes.",
-		ctaText: "Live Demo →",
+		description: "Низкая задержка, каналы, статус присутствия и управление нагрузкой. Включает нагрузочные тесты и рекомендации по горизонтальному масштабированию.",
+		ctaText: "Демо →",
 		ctaLink: "#",
 		icon: PhoenixIcon
 	},
 	{
-		title: "Product Analytics Pipeline",
+		title: "Пайплайн продуктовой аналитики",
 		techStack: "Node.js • PostHog • PostgreSQL • ClickHouse",
-		description: "Event ingestion, batching, and replay; user properties and cohorts; dashboards for funnels, retention, and feature adoption.",
-		ctaText: "Read Case Study →",
+		description: "Сбор, пакетирование и воспроизведение событий; свойства пользователей, когортный анализ, дашборды для воронок, удержания и анализа функций.",
+		ctaText: "Кейс →",
 		ctaLink: "#",
 		icon: PosthogIcon
 	},
 	{
-		title: "Data Ingestion & ETL",
+		title: "Загрузка данных и ETL-процессы",
 		techStack: "Python • Airflow • PostgreSQL • S3",
-		description: "Scheduled extract/transform/load with schema migrations, data quality checks, and partitioned tables for analytics.",
-		ctaText: "View Repo →",
+		description: "Регулярное извлечение, преобразование и загрузка данных с миграцией схем, проверками качества и партиционированными таблицами для аналитики.",
+		ctaText: "Посмотреть репозиторий →",
 		ctaLink: "#",
 		icon: PythonIcon
 	},
 	{
-		title: "Design System",
+		title: "Дизайн-система",
 		techStack: "React • TypeScript • Tailwind CSS • Storybook",
-		description: "Accessible UI kit with tokens, theming, and testing. Published as a versioned package with changelogs and docs.",
-		ctaText: "Docs →",
+		description: "Доступный UI-кит с токенами, темизацией и тестированием. Публикуется как версионированный пакет с changelog и документацией.",
+		ctaText: "Документация →",
 		ctaLink: "#",
 		icon: TailwindIcon
 	},
