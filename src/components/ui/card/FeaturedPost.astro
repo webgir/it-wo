@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../../FormattedDate.astro';
 import { slugifyTag as slugify } from '../../../lib/slug';
+import { Fragment } from 'astro/jsx-runtime';
 
 interface Props { post: CollectionEntry<'blog'>; readingTimeMin?: number }
 const { post, readingTimeMin = 0 } = Astro.props as Props;

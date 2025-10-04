@@ -2,7 +2,7 @@
 interface Props {
   currentPage: number;
   totalPages: number;
-  basePath?: string; // e.g. '/blog/page'
+  basePath?: string; // например: '/blog/page'
 }
 
 const { currentPage, totalPages, basePath = '/blog/page' } = Astro.props as Props;
@@ -11,21 +11,19 @@ const nextHref = currentPage < totalPages ? `${basePath}/${currentPage + 1}/` : 
 ---
 
 {totalPages > 1 && (
-  <nav class="mt-6 flex items-center justify-center gap-3" aria-label="Pagination">
+  <nav class="mt-6 flex items-center justify-center gap-3" aria-label="Навигация по страницам">
     {prevHref ? (
-      <a href={prevHref} class="sw-btn">Previous</a>
+      <a href={prevHref} class="sw-btn">Предыдущая</a>
     ) : (
-      <span class="sw-btn" style="opacity:.5; pointer-events:none;">Previous</span>
+      <span class="sw-btn" style="opacity:.5; pointer-events:none;">Предыдущая</span>
     )}
     <span class="text-sm text-[color:var(--color-text-muted)]">
-      Page {currentPage} of {totalPages}
+      Страница {currentPage} из {totalPages}
     </span>
     {nextHref ? (
-      <a href={nextHref} class="sw-btn">Next</a>
+      <a href={nextHref} class="sw-btn">Следующая</a>
     ) : (
-      <span class="sw-btn" style="opacity:.5; pointer-events:none;">Next</span>
+      <span class="sw-btn" style="opacity:.5; pointer-events:none;">Следующая</span>
     )}
   </nav>
 )}
-
-
