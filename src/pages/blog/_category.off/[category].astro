@@ -8,24 +8,35 @@ import { getCategoryMeta, slugifyCategory } from '../../../data/categories';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  const categories = [
-    ...new Set(
+
+  const categories = Array.from(
+    new Set(
       posts
-        .map((p) => p.data.category || null)
-        .filter((v): v is string => Boolean(v))
-        .map((name) => slugifyCategory(name))
-    ),
-  ];
+        .map((p) => (p.data.category ?? '').trim()) // нормализуем исходную строку
+        .filter(Boolean)                             // убираем пустые до слага
+        .map((name) => slugifyCategory(name))        // слагаем
+        .filter(Boolean)                             // важное: убираем пустые после слага!
+    )
+  );
+
   return categories.map((category) => ({ params: { category } }));
 }
 
 const { category } = Astro.params;
-const posts = (await getCollection('blog')).filter((p) => slugifyCategory(p.data.category || '') === category);
-const meta = getCategoryMeta(category);
+const sameSlug = (s: string) => slugifyCategory((s ?? '').trim());
+
+const all = await getCollection('blog');
+const posts = all.filter((p) => sameSlug(p.data.category || '') === category);
+
+// безопасный meta (на случай, если getCategoryMeta не знает такой категории)
+const meta = getCategoryMeta(category) ?? {
+  title: `Категория: ${category}`,
+  description: `Публикации из категории «${category}».`
+};
 ---
-<html lang="en" data-theme="dark" class="dark">
+<html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={`${meta.title} - Category`} description={meta.description} />
+    <BaseHead title={`${meta.title}`} description={meta.description} />
     <link rel="alternate" type="application/rss+xml" title={`Category: ${category} feed`} href={`/rss/category/${category}.xml`} />
   </head>
   <body>
@@ -37,13 +48,9 @@ const meta = getCategoryMeta(category);
       </div>
       <p class="text-[color:var(--color-text-muted)]">{meta.description}</p>
       <div class="blog-grid">
-        {posts.map((p) => (
-          <PostCard post={p} />
-        ))}
+        {posts.map((p) => <PostCard post={p} />)}
       </div>
     </main>
     <Footer />
   </body>
 </html>
-
-

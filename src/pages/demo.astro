@@ -1,4 +1,4 @@
----
+﻿---
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/sections/Header.astro";
 import Footer from "../components/sections/Footer.astro";
@@ -37,6 +37,12 @@ const pageTitle = "Component & Sections Demo";
 const pageDescription = "Showcase of components and sections with light/dark theming.";
 const posts = await getCollection('blog');
 const [firstPost, secondPost, thirdPost] = posts.slice(0, 3);
+
+const toPostHref = (post: typeof posts[number]) => {
+  const rawSlug = (post.data.slug ?? post.slug ?? post.id).replace(/^.*\//, '').replace(/\.(md|mdx)$/, '');
+  const categoryRaw = String(post.data.category ?? 'notes');
+  return `/blog/${encodeURIComponent(categoryRaw)}/${encodeURIComponent(rawSlug)}/`;
+};
 ---
 
 <html lang="en" data-theme="dark" class="dark">
@@ -142,7 +148,7 @@ const [firstPost, secondPost, thirdPost] = posts.slice(0, 3);
         <section class="card-surface p-6 space-y-6">
           <h2 class="text-2xl font-semibold">Post Meta, Nav, Share</h2>
           <PostMeta pubDate={firstPost.data.pubDate} readingTimeMin={5} authorName={firstPost.data.author} />
-          <PostNav prev={secondPost && { id: secondPost.id, title: secondPost.data.title }} next={thirdPost && { id: thirdPost.id, title: thirdPost.data.title }} />
+          <PostNav prev={secondPost && { href: toPostHref(secondPost), title: secondPost.data.title }} next={thirdPost && { href: toPostHref(thirdPost), title: thirdPost.data.title }} />
           <ShareButtons title={firstPost.data.title} url={Astro.url.toString()} />
           <BlogPagination currentPage={2} totalPages={5} />
         </section>
@@ -159,5 +165,3 @@ const [firstPost, secondPost, thirdPost] = posts.slice(0, 3);
     <Footer />
   </body>
 </html>
-
-

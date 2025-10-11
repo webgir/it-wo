@@ -1,46 +1,68 @@
 ---
-import { type CollectionEntry, getCollection, render } from "astro:content";
-import BlogPost from "../layouts/BlogPost.astro";
-import { calculateReadingTimeFromHtml } from "../lib/reading";
+
+import { getCollection } from 'astro:content';
+import BlogPost from '../layouts/BlogPost.astro';
+import { calculateReadingTimeFromHtml } from '../lib/reading';
+import { slugifyTag } from '../lib/slug';
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return posts.map((post) => ({
-    params: {
-      slug: ((post as any).slug ?? post.id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")
-    },
-    props: post,
-  }));
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => {
+    const slug = slugifyTag((post.data.slug ?? post.id).replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''));
+    return { params: { slug } };
+  });
 }
-type Props = CollectionEntry<"blog">;
 
-const post = Astro.props as Props;
-const posts = await getCollection("blog", ({ data }) => !data.draft);
 
-const currentSlug = ((post as any).slug ?? post.id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "");
+const { slug } = Astro.params;
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const post = posts.find((p) => {
+  const postSlug = slugifyTag((p.data.slug ?? p.id).replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''));
+  return postSlug === slug;
+});
+if (!post) {
+  return new Response('Not found', { status: 404 });
+}
 
-// соседи
 const sorted = posts.slice().sort((a, b) => +b.data.pubDate - +a.data.pubDate);
 const index = sorted.findIndex((p) => p.id === post.id);
-const prev = index < sorted.length - 1
-  ? { id: (((sorted[index + 1] as any).slug ?? sorted[index + 1].id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")), title: sorted[index + 1].data.title }
-  : null;
-const next = index > 0
-  ? { id: (((sorted[index - 1] as any).slug ?? sorted[index - 1].id).replace(/^.*\//, "").replace(/\.(md|mdx)$/, "")), title: sorted[index - 1].data.title }
-  : null;
+const prevPost =
+  index < sorted.length - 1
+    ? {
+        title: sorted[index + 1].data.title,
+        href: `/${slugifyTag((sorted[index + 1].data.slug ?? sorted[index + 1].id).replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''))}/`,
+      }
+    : null;
+const nextPost =
+  index > 0
+    ? {
+        title: sorted[index - 1].data.title,
+        href: `/${slugifyTag((sorted[index - 1].data.slug ?? sorted[index - 1].id).replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''))}/`,
+      }
+    : null;
 
-const { Content } = await render(post);
-const html = await Astro.slots.render("default");
-const readingTimeMin = calculateReadingTimeFromHtml(html ?? "");
-
-const canonicalUrl = `/${currentSlug}/`;
+const { render } = await import('astro:content');
+const { Content, headings } = await render(post);
+const html = await Astro.slots.render('default');
+const readingTimeMin = calculateReadingTimeFromHtml(html ?? '');
+const canonicalUrl = `/${slug}/`;
+const toc =
+  headings
+    ?.filter((heading) => heading.depth === 2 || heading.depth === 3)
+    .map((heading) => ({
+      id: heading.slug,
+      level: heading.depth,
+      text: heading.text,
+    })) ?? [];
 ---
+
 <BlogPost
   {...post.data}
-  prevPost={prev}
-  nextPost={next}
+  prevPost={prevPost}
+  nextPost={nextPost}
   readingTimeMin={readingTimeMin}
   canonicalUrl={canonicalUrl}
+  toc={toc}
 >
   <Content />
 </BlogPost>

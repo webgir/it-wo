@@ -1,0 +1,50 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/sections/Header.astro';
+import Footer from '../../components/sections/Footer.astro';
+import PostCard from '../../components/ui/card/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const { slugifyTag } = await import('../../lib/slug');
+  const categories = Array.from(
+    new Set(
+      posts
+        .map(p => slugifyTag(String(p.data.category ?? '').trim()))
+        .filter(Boolean)
+    )
+  );
+  return categories.map((category) => ({
+    params: { category },
+  }));
+}
+
+const raw = Astro.params.category ?? '';
+const category = decodeURIComponent(String(raw));
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft && String(data.category ?? '') === category))
+  .sort((a,b) => +b.data.pubDate - +a.data.pubDate);
+
+// Если в категории нет статей — 404 (можно заменить на мягкое сообщение)
+if (!posts.length) {
+  return new Response('Not found', { status: 404 });
+}
+---
+
+<html lang="ru" data-theme="dark" class="dark">
+  <head>
+    <BaseHead title={`Блог — ${category}`} description={`Статьи категории «${category}».`} />
+  </head>
+  <body>
+    <Header />
+    <main class="mx-auto max-w-5xl px-3 py-5 space-y-6">
+      <h1 class="text-3xl font-bold">Категория: {category}</h1>
+
+      <section class="grid gap-6 md:grid-cols-2">
+        {posts.map(p => <PostCard post={p} />)}
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

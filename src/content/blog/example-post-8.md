@@ -1,10 +1,12 @@
 ---
-title: 'Example Post Eight'
-description: 'Final sample post using example hero images.'
-pubDate: 'Aug 08 2025'
-heroImage: '../../assets/images/example-blog-hero8.jpg'
-category: 'Showcase'
-tags: ['template']
+title: "exampl-post-8"
+description: "-----"
+pubDate: 2025-08-8
+heroImage: https://it-wo.ru/images/blog/web/domen-emodzi/domen-sostoyashchiy-iz-emodzi-1.png
+category: разработка сайта
+tags:
+  - веб
+slug: exampl-post-8
 ---
 
 Done! You now have eight example posts mapped to the eight hero images.

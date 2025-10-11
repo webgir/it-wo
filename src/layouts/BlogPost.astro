@@ -1,5 +1,6 @@
----
+﻿---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/sections/Footer.astro';
@@ -12,15 +13,17 @@ import PostNav from '../components/ui/nav/PostNav.astro';
 type BlogData = CollectionEntry<'blog'>['data'];
 type Props = BlogData & {
   showHeader?: boolean;
-  prevPost?: { id: string; title: string } | null;
-  nextPost?: { id: string; title: string } | null;
+  prevPost?: { title: string; href: string } | null;
+  nextPost?: { title: string; href: string } | null;
   readingTimeMin?: number;
   canonicalUrl?: string;
+  toc?: Array<{ id: string; level: number; text: string }>;
+  updatedDate?: Date | string;
 };
 
 const {
   title,
-  description,
+  description = '',
   pubDate,
   updatedDate,
   heroImage,
@@ -28,125 +31,424 @@ const {
   prevPost = null,
   nextPost = null,
   readingTimeMin = 0,
-  canonicalUrl
+  canonicalUrl,
+  toc,
 } = Astro.props as Props;
+
+const hasToc = Array.isArray(toc) && toc.length > 0;
+const heroImageIsAsset = typeof heroImage === 'object' && heroImage !== null && 'src' in heroImage;
+const heroImageSrc = heroImageIsAsset
+  ? (heroImage as ImageMetadata).src
+  : typeof heroImage === 'string'
+    ? heroImage
+    : undefined;
+const heroImageUrl = heroImageSrc ? new URL(heroImageSrc, Astro.site).toString() : undefined;
 ---
 
 <html lang="en" data-theme="dark" class="dark">
-	<head>
-		<BaseHead title={title} description={description} image={heroImage} />
-		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-		<meta property="og:type" content="article" />
-		{pubDate && <meta property="article:published_time" content={new Date(pubDate).toISOString()} />}
-		{updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
-		<meta property="article:author" content={Astro.props.author || 'Site Author'} />
-		{Array.isArray(Astro.props.tags) && Astro.props.tags.map((t) => (
-		  <meta property="article:tag" content={t} />
-		))}
+  <head>
+    <BaseHead title={title} description={description} image={heroImage} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta property="og:type" content="article" />
+    {pubDate && <meta property="article:published_time" content={new Date(pubDate).toISOString()} />}
+    {updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
+    <meta property="article:author" content={Astro.props.author || 'Site Author'} />
+    {Array.isArray(Astro.props.tags) &&
+      Astro.props.tags.map((t) => <meta property="article:tag" content={t} />)}
 
-		<!-- JSON-LD: Article -->
-		<script type="application/ld+json" set:html={JSON.stringify({
-		  '@context': 'https://schema.org',
-		  '@type': 'Article',
-		  headline: title,
-		  description,
-		  image: Astro.props.heroImage ? new URL(Astro.props.heroImage.src, Astro.site).toString() : undefined,
-		  datePublished: pubDate ? new Date(pubDate).toISOString() : undefined,
-		  dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
-		  author: [{ '@type': 'Person', name: Astro.props.author || 'Site Author' }],
-		  publisher: { '@type': 'Organization', name: 'guihubie.com' },
-		  mainEntityOfPage: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-		  url: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-		})} />
+    <!-- JSON-LD: Article -->
+    <script
+      type="application/ld+json" is:inline
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        image: heroImageUrl,
+        datePublished: pubDate ? new Date(pubDate).toISOString() : undefined,
+        dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
+        author: [{ '@type': 'Person', name: Astro.props.author || 'Site Author' }],
+        publisher: { '@type': 'Organization', name: 'guihubie.com' },
+        mainEntityOfPage: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+        url: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+      })}
+    />
 
-		<!-- JSON-LD: Breadcrumbs -->
-		<script type="application/ld+json" set:html={JSON.stringify((() => {
-		  const isBlogPath = Astro.url.pathname.startsWith('/blog/');
-		  const items = [
-		    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
-		  ];
-		  if (isBlogPath) {
-		    items.push({ '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/blog/', Astro.site).toString() });
-		    items.push({ '@type': 'ListItem', position: 3, name: title, item: (canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString()) });
-		  } else {
-		    items.push({ '@type': 'ListItem', position: 2, name: title, item: (canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString()) });
-		  }
-		  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
-		})())} />
-		<style>
-			main {
-				width: 1280px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				background: var(--color-bg-primary);
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 100%;
-				max-width: 870px;
-				margin: auto;
-				padding: 0.05em;
-				color: var(--color-text-secondary);
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-				color: var(--color-text-primary);
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: var(--color-text-muted);
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
-	</head>
+    <!-- JSON-LD: Breadcrumbs -->
+    <script
+      type="application/ld+json" is:inline
+      set:html={JSON.stringify((() => {
+        const isBlogPath = Astro.url.pathname.startsWith('/blog/');
+        const items = [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+        ];
+        if (isBlogPath) {
+          items.push({
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: new URL('/blog/', Astro.site).toString(),
+          });
+          items.push({
+            '@type': 'ListItem',
+            position: 3,
+            name: title,
+            item: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+          });
+        } else {
+          items.push({
+            '@type': 'ListItem',
+            position: 2,
+            name: title,
+            item: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+          });
+        }
+        return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
+      })())}
+    />
+    <style>
+      :root {
+        --toc-scroll-offset: 112px;
+      }
 
-	<body>
-		<Header />
-		<main>
-			<article>
-                {showHeader && (
-                    <div class="hero-image">
-                        {heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+      main {
+        width: 1280px;
+        max-width: calc(100% - 2em);
+        margin: auto;
+        background: var(--color-bg-primary);
+      }
+
+      .hero-image {
+        width: 100%;
+      }
+
+      .hero-image img {
+        display: block;
+        margin: 0 auto;
+        border-radius: 12px;
+        box-shadow: var(--box-shadow);
+      }
+
+      .article-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 0 1rem 2rem;
+      }
+
+      article.has-toc .article-content {
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        .article-content {
+          padding: 0 2rem 3rem;
+        }
+
+        article.has-toc .article-content {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+          align-items: start;
+          column-gap: 2.5rem;
+          row-gap: 1rem;
+        }
+
+        article.has-toc .post-body {
+          grid-column: 1;
+          grid-row: 1;
+        }
+
+        article.has-toc .toc-wrapper {
+          grid-column: 2;
+          grid-row: 1;
+          margin-top: 1rem;
+        }
+      }
+
+      .post-body {
+        width: 100%;
+        max-width: 870px;
+        margin: 1rem auto 0;
+        padding: 0.05em;
+        color: var(--color-text-secondary);
+      }
+
+      article.has-toc .post-body {
+        margin: 1rem 0 0;
+      }
+
+      .post-body h2,
+      .post-body h3 {
+        scroll-margin-top: var(--toc-scroll-offset);
+      }
+
+      .title {
+        margin-bottom: 1em;
+        padding: 0.5em 0 1em;
+        text-align: center;
+        line-height: 1;
+      }
+
+      .title h1 {
+        margin: 0 0 0.5em 0;
+        color: var(--color-text-primary);
+      }
+
+      .date {
+        margin-bottom: 0.5em;
+        color: var(--color-text-muted);
+      }
+
+      .last-updated-on {
+        font-style: italic;
+      }
+
+      .toc-wrapper {
+        background: var(--color-bg-secondary);
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: var(--box-shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        order: -1;
+      }
+
+      @media (min-width: 640px) {
+        .toc-wrapper {
+          order: initial;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .toc-wrapper {
+          position: sticky;
+          top: calc(var(--toc-scroll-offset) - 16px);
+          max-height: calc(100vh - var(--toc-scroll-offset));
+          overflow: auto;
+        }
+      }
+
+      .toc-title {
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--color-text-primary);
+      }
+
+      .toc-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .toc-item.level-3 {
+        padding-left: 1rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .toc-link {
+        display: inline-block;
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        transition: color 0.2s ease, transform 0.2s ease;
+      }
+
+      .toc-link:hover,
+      .toc-link:focus-visible {
+        color: var(--accent, #70b3ff);
+      }
+
+      .toc-link.is-active {
+        color: var(--color-text-primary);
+        font-weight: 600;
+      }
+
+      .toc-link.is-active::before {
+        content: '•';
+        margin-right: 0.5rem;
+        color: var(--accent, #70b3ff);
+      }
+
+      .toc-wrapper::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .toc-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <Header />
+    <main>
+      <article class:list={{ 'has-toc': hasToc }}>
+        {showHeader && (
+          <div class="hero-image">
+            {heroImageIsAsset ? (
+            <Image width={1020} height={510} src={heroImage} alt="" />
+          ) : heroImageSrc ? (
+            <img width="1020" height="510" src={heroImageSrc} alt="" loading="lazy" />
+          ) : null}
+          </div>
+        )}
+
+        <div class:list={{ 'article-content': true, 'with-toc': hasToc }}>
+          {hasToc && (
+            <aside class="toc-wrapper" aria-label="Table of contents">
+              <span class="toc-title">Contents</span>
+              <ul class="toc-list">
+                {(toc ?? []).map((item) => (
+                  <li class={`toc-item level-${item.level}`}>
+                    <a class="toc-link" href={`#${item.id}`} data-toc-target={item.id}>
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+
+          <div class:list={{ 'post-body': true, prose: true }}>
+            {showHeader && (
+              <div class="title">
+                <div class="date">
+                  <FormattedDate date={pubDate} />
+                  {updatedDate && (
+                    <div class="last-updated-on">
+                      Last updated on <FormattedDate date={updatedDate} />
                     </div>
-                )}
-                <div class="prose">
-                    {showHeader && (
-                        <div class="title">
-                            <div class="date">
-                                <FormattedDate date={pubDate} />
-                                {updatedDate && (
-                                    <div class="last-updated-on">
-                                        Last updated on <FormattedDate date={updatedDate} />
-                                    </div>
-                                )}
-                            </div>
-                            <h1>{title}</h1>
-                            <hr />
-                        </div>
-                    )}
-                    <ShareButtons title={title} url={Astro.url.toString()} />
-					<PostMeta pubDate={pubDate} readingTimeMin={readingTimeMin} authorName={Astro.props.author || 'Site Author'} />
-                    <slot />
-                    <PostNav prev={prevPost} next={nextPost} />
+                  )}
                 </div>
-			</article>
-		</main>
-		<Footer />
-	</body>
+                <h1>{title}</h1>
+                <hr />
+              </div>
+            )}
+
+            <ShareButtons title={title} url={Astro.url.toString()} />
+            <PostMeta
+              pubDate={pubDate}
+              readingTimeMin={readingTimeMin}
+              authorName={Astro.props.author || 'Site Author'}
+            />
+
+            <slot />
+            <PostNav prev={prevPost} next={nextPost} />
+          </div>
+        </div>
+
+        {hasToc && (
+          <script type="module" is:inline>
+            const article = document.currentScript?.parentElement;
+            if (!article) {
+              return;
+            }
+            const postBody = article.querySelector('.post-body');
+            const tocLinks = Array.from(article.querySelectorAll('.toc-wrapper .toc-link'));
+            if (!postBody || tocLinks.length === 0) {
+              return;
+            }
+
+            const items = tocLinks
+              .map((link) => {
+                const targetId = link.dataset.tocTarget || link.getAttribute('href')?.slice(1);
+                if (!targetId) return null;
+                const target = document.getElementById(targetId);
+                if (!target || !postBody.contains(target)) return null;
+                return { id: targetId, link, heading: target };
+              })
+              .filter(Boolean);
+
+            if (items.length === 0) {
+              return;
+            }
+
+            const prefersReducedMotion =
+              window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+            const setActive = (id) => {
+              items.forEach(({ id: itemId, link }) => {
+                const isActive = itemId === id;
+                link.classList.toggle('is-active', isActive);
+                if (isActive) {
+                  link.setAttribute('aria-current', 'true');
+                } else {
+                  link.removeAttribute('aria-current');
+                }
+              });
+            };
+
+            const ensureVisibleFallback = () => {
+              const scrollPosition = window.scrollY + 140;
+              let current = items[0];
+              for (const item of items) {
+                if (item.heading.offsetTop <= scrollPosition) {
+                  current = item;
+                } else {
+                  break;
+                }
+              }
+              setActive(current.id);
+            };
+
+            tocLinks.forEach((link) => {
+              link.addEventListener('click', (event) => {
+                const targetId = link.dataset.tocTarget || link.getAttribute('href')?.slice(1);
+                if (!targetId) return;
+                const targetItem = items.find(({ id }) => id === targetId);
+                if (!targetItem) return;
+                event.preventDefault();
+                targetItem.heading.scrollIntoView({
+                  behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                  block: 'start',
+                });
+                history.replaceState(null, '', '#' + targetId);
+                setActive(targetId);
+              });
+            });
+
+            if ('IntersectionObserver' in window) {
+              const observer = new IntersectionObserver(
+                (entries) => {
+                  let updated = false;
+                  entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                      setActive(entry.target.id);
+                      updated = true;
+                    }
+                  });
+                  if (!updated) {
+                    ensureVisibleFallback();
+                  }
+                },
+                {
+                  rootMargin: '-45% 0px -40% 0px',
+                  threshold: [0, 0.4, 0.75],
+                }
+              );
+              items.forEach(({ heading }) => observer.observe(heading));
+            } else {
+              ensureVisibleFallback();
+            }
+
+            const hashTarget = decodeURIComponent(window.location.hash.slice(1));
+            if (hashTarget) {
+              setActive(hashTarget);
+            } else {
+              ensureVisibleFallback();
+            }
+          </script>
+        )}
+      </article>
+    </main>
+    <Footer />
+  </body>
 </html>

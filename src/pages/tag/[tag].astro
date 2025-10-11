@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/sections/Header.astro';
+import Footer from '../../components/sections/Footer.astro';
+import BlogAllArticles from '../../components/sections/BlogAllArticles.astro';
+import { slugifyTag } from '../../lib/slug';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const tags = Array.from(new Set(posts.flatMap(p => p.data.tags ?? [])));
+  return tags.map(tag => ({ params: { tag: slugifyTag(tag) } }));
+}
+
+const { tag } = Astro.params;
+const posts = (await getCollection('blog')).filter(p => {
+  const postTags = (p.data.tags ?? []).map(slugifyTag);
+  return postTags.includes(tag);
+});
+---
+<html lang="ru" data-theme="dark" class="dark">
+  <head>
+    <BaseHead title={`Статьи по тегу: ${tag}`} description={`Все статьи с тегом ${tag}`} />
+  </head>
+  <body>
+    <Header />
+    <main class="use-utility-layout mx-auto max-w-5xl px-3 py-5 space-y-7">
+      <h1 class="text-2xl font-bold mb-4">Статьи по тегу: {tag}</h1>
+      <BlogAllArticles posts={posts} />
+    </main>
+    <Footer />
+  </body>
+</html>

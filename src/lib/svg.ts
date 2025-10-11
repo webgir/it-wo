@@ -1,9 +1,9 @@
-export function sanitizeToOutline(svg: string, size: number = 16): string {
+﻿export function sanitizeToOutline(svg: string, size: number = 16): string {
   let s = svg
     .replace(/<\?xml[\s\S]*?\?>/g, '')
     .replace(/<!--([\s\S]*?)-->/g, '')
     // normalize size attributes on root and any nested symbols
-    .replace(/<svg([^>]*?)>/, (m, attrs) => {
+    .replace(/<svg([^>]*?)>/, (_match, attrs) => {
       let a = attrs
         // drop existing width/height
         .replace(/\swidth=\"[^\"]*\"/g, '')
@@ -22,8 +22,8 @@ export function sanitizeToOutline(svg: string, size: number = 16): string {
   const tags = ['path', 'rect', 'circle', 'polygon', 'ellipse'];
   for (const tag of tags) {
     const re = new RegExp(`<${tag}([^>]*)>`, 'gi');
-    s = s.replace(re, (m, attrs) => {
-      if (/fill=/.test(attrs)) return m;
+    s = s.replace(re, (_match, attrs) => {
+      if (/fill=/.test(attrs)) return _match;
       return `<${tag}${attrs} fill="none">`;
     });
   }

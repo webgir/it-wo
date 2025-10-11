@@ -1,4 +1,4 @@
----
+﻿---
 import { SITE_TITLE } from "../../consts";
 const today = new Date();
 import contactIconRaw from "../../assets/icons/contact-icon.svg?raw";
@@ -13,7 +13,7 @@ function sanitizeToWhite(svg: string, size = 18) {
     .replace(/fill=\"[^\"]*\"/gi, 'fill="currentColor"')
     // не отключаем stroke, а приводим к currentColor
     .replace(/stroke=\"[^\"]*\"/gi, 'stroke="currentColor"');
-  s = s.replace(/<svg([^>]*)>/, (m, attrs) => `<svg${attrs} width="${size}" height="${size}" aria-hidden="true" focusable="false">`);
+  s = s.replace(/<svg([^>]*)>/, (_match, attrs) => `<svg${attrs} width="${size}" height="${size}" aria-hidden="true" focusable="false">`);
   return s;
 }
 
@@ -28,8 +28,8 @@ const inoreaderUrl = `https://www.inoreader.com/?add_feed=${feedUrl}`;
   <p class="mt-2 text-[color:var(--color-text-muted)]">Давайте создадим что-нибудь вместе!</p>
 
   <div class="mt-6 flex justify-center">
-    <Button href="https://www.linkedin.com/in/guihubie/" variant="secondary" size="md" aria-label="Связаться через LinkedIn">
-      <span class="sr-only">Иконка контакта</span>
+    <Button href="https://t.me/webgir" target="_blank" rel="noopener noreferrer" variant="secondary" size="md" aria-label="Связаться через Telegram">
+      <span class="sr-only">Связаться в Telegram</span>
       <span class="inline-flex" aria-hidden="true" set:html={contactIcon} />
       Связаться
     </Button>
@@ -48,7 +48,7 @@ const inoreaderUrl = `https://www.inoreader.com/?add_feed=${feedUrl}`;
 
   <div class="sr-only" id="copy-status" aria-live="polite"></div>
 
-  <script type="module">
+  <script type="module" is:inline>
     document.addEventListener('click', (e) => {
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;

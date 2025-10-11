@@ -1,4 +1,4 @@
----
+﻿---
 interface Item {
   title: string;
   company: string;
@@ -26,7 +26,7 @@ function normalizeIcon(raw: string): string {
     .replace(/fill=\"#000000\"/g, 'fill="none"')
     .replace(/fill=\"#ffffff\"/gi, 'fill="none"');
   // Ensure root svg has fill="none" and stroke="currentColor"
-  s = s.replace(/<svg([^>]*)>/, (m, attrs) => {
+  s = s.replace(/<svg([^>]*)>/, (_match, attrs) => {
     let a = attrs;
     if (!/fill=/.test(a)) a += ' fill="none"';
     if (!/stroke=/.test(a)) a += ' stroke="currentColor"';

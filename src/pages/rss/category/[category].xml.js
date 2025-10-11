@@ -4,8 +4,9 @@ import { slugifyCategory } from '../../../../src/data/categories';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  const categories = [...new Set(posts.map((p) => p.data.category).filter(Boolean))];
-  return categories.map((c) => ({ params: { category: slugifyCategory(c) } }));
+  const categories = [...new Set(posts.map((p) => slugifyCategory(String(p.data.category ?? '').trim())))]
+    .filter((c) => !!c);
+  return categories.map((c) => ({ params: { category: c } }));
 }
 
 export async function GET(context) {

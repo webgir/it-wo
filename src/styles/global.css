@@ -7,6 +7,87 @@
 /* Project-specific utilities */
 @import "./utilities.css";
 
+/* Local Stara font family */
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-Medium.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-Medium.woff") format("woff");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-MediumItalic.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-MediumItalic.woff") format("woff");
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-SemiBold.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-SemiBold.woff") format("woff");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-SemiBoldItalic.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-SemiBoldItalic.woff") format("woff");
+	font-weight: 600;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-Bold.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-Bold.woff") format("woff");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-BoldItalic.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-BoldItalic.woff") format("woff");
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-ExtraBold.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-ExtraBold.woff") format("woff");
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-ExtraBoldItalic.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-ExtraBoldItalic.woff") format("woff");
+	font-weight: 800;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-Black.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-Black.woff") format("woff");
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Stara";
+	src: url("/fonts/Web-TT/Stara-BlackItalic.woff2") format("woff2"),
+		url("/fonts/Web-TT/Stara-BlackItalic.woff") format("woff");
+	font-weight: 900;
+	font-style: italic;
+	font-display: swap;
+}
 
 @font-face {
 	font-family: "Atkinson";
@@ -23,7 +104,7 @@
 	font-display: swap;
 }
 body {
-	font-family: "Atkinson", sans-serif;
+	font-family: "Stara", "Atkinson", system-ui, sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: left;
