@@ -1,32 +1,49 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/sections/Header.astro';
 import Footer from '../../components/sections/Footer.astro';
-import BlogAllArticles from '../../components/sections/BlogAllArticles.astro';
-import { slugifyTag } from '../../lib/slug';
+import PostCard from '../../components/ui/card/PostCard.astro';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  const tags = Array.from(new Set(posts.flatMap(p => p.data.tags ?? [])));
-  return tags.map(tag => ({ params: { tag: slugifyTag(tag) } }));
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = Array.from(
+    new Set(
+      posts
+        .flatMap(p => p.data.tags ?? [])
+        .filter(Boolean)
+    )
+  );
+  // Генерируем пути как есть
+  return tags.map((tag) => ({
+    params: { tag },
+  }));
 }
 
-const { tag } = Astro.params;
-const posts = (await getCollection('blog')).filter(p => {
-  const postTags = (p.data.tags ?? []).map(slugifyTag);
-  return postTags.includes(tag);
-});
+const raw = Astro.params.tag ?? '';
+const tag = decodeURIComponent(String(raw));
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft && (data.tags ?? []).includes(tag)))
+  .sort((a,b) => +b.data.pubDate - +a.data.pubDate);
+
+// Если в теге нет статей — 404
+if (!posts.length) {
+  return Astro.response(new Response('Not found', { status: 404 }));
+}
 ---
+
 <html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={`Статьи по тегу: ${tag}`} description={`Все статьи с тегом ${tag}`} />
+    <BaseHead title={`Блог — ${tag}`} description={`Статьи с тегом «${tag}».`} image={undefined} />
   </head>
   <body>
     <Header />
-    <main class="use-utility-layout mx-auto max-w-5xl px-3 py-5 space-y-7">
-      <h1 class="text-2xl font-bold mb-4">Статьи по тегу: {tag}</h1>
-      <BlogAllArticles posts={posts} />
+    <main class="mx-auto max-w-5xl px-3 py-5 space-y-6">
+      <h1 class="text-3xl font-bold">Тег: {tag}</h1>
+
+      <section class="grid gap-6 md:grid-cols-2">
+        {posts.map(p => <PostCard post={p} />)}
+      </section>
     </main>
     <Footer />
   </body>

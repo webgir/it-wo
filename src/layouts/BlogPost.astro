@@ -1,29 +1,25 @@
 ﻿---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/sections/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/sections/Header.astro';
 import PostMeta from '../components/ui/meta/PostMeta.astro';
-import ShareButtons from '../components/ui/share/ShareButtons.astro';
 import PostNav from '../components/ui/nav/PostNav.astro';
 
 type BlogData = CollectionEntry<'blog'>['data'];
+type NavLink = { title: string; href: string } | null;
 type Props = BlogData & {
   showHeader?: boolean;
-  prevPost?: { title: string; href: string } | null;
-  nextPost?: { title: string; href: string } | null;
+  prevPost?: NavLink;
+  nextPost?: NavLink;
   readingTimeMin?: number;
   canonicalUrl?: string;
-  toc?: Array<{ id: string; level: number; text: string }>;
-  updatedDate?: Date | string;
 };
 
 const {
   title,
-  description = '',
+  description,
   pubDate,
   updatedDate,
   heroImage,
@@ -31,293 +27,199 @@ const {
   prevPost = null,
   nextPost = null,
   readingTimeMin = 0,
-  canonicalUrl,
-  toc,
+  canonicalUrl
 } = Astro.props as Props;
-
-const hasToc = Array.isArray(toc) && toc.length > 0;
-const heroImageIsAsset = typeof heroImage === 'object' && heroImage !== null && 'src' in heroImage;
-const heroImageSrc = heroImageIsAsset
-  ? (heroImage as ImageMetadata).src
-  : typeof heroImage === 'string'
-    ? heroImage
-    : undefined;
-const heroImageUrl = heroImageSrc ? new URL(heroImageSrc, Astro.site).toString() : undefined;
 ---
 
-<html lang="en" data-theme="dark" class="dark">
+<html lang="ru" data-theme="dark" class="dark">
   <head>
+    <!-- @ts-ignore -->
     <BaseHead title={title} description={description} image={heroImage} />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta property="og:type" content="article" />
     {pubDate && <meta property="article:published_time" content={new Date(pubDate).toISOString()} />}
     {updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
     <meta property="article:author" content={Astro.props.author || 'Site Author'} />
-    {Array.isArray(Astro.props.tags) &&
-      Astro.props.tags.map((t) => <meta property="article:tag" content={t} />)}
+    {Array.isArray(Astro.props.tags) && Astro.props.tags.map((t) => (
+      <meta property="article:tag" content={t} />
+    ))}
 
     <!-- JSON-LD: Article -->
-    <script
-      type="application/ld+json" is:inline
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: title,
-        description,
-        image: heroImageUrl,
-        datePublished: pubDate ? new Date(pubDate).toISOString() : undefined,
-        dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
-        author: [{ '@type': 'Person', name: Astro.props.author || 'Site Author' }],
-        publisher: { '@type': 'Organization', name: 'guihubie.com' },
-        mainEntityOfPage: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-        url: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-      })}
-    />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description,
+      image: heroImage ? new URL(heroImage, Astro.site).toString() : undefined,
+      datePublished: pubDate ? new Date(pubDate).toISOString() : undefined,
+      dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
+      author: [{ '@type': 'Person', name: Astro.props.author || 'Site Author' }],
+      publisher: { 
+        '@type': 'Organization', 
+        name: 'it-wo.ru',
+        logo: {
+          '@type': 'ImageObject',
+          url: new URL('/logo.png', Astro.site).toString()
+        }
+      },
+      mainEntityOfPage: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+      url: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
+    })} />
 
     <!-- JSON-LD: Breadcrumbs -->
-    <script
-      type="application/ld+json" is:inline
-      set:html={JSON.stringify((() => {
-        const isBlogPath = Astro.url.pathname.startsWith('/blog/');
-        const items = [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
-        ];
-        if (isBlogPath) {
-          items.push({
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Blog',
-            item: new URL('/blog/', Astro.site).toString(),
-          });
-          items.push({
-            '@type': 'ListItem',
-            position: 3,
-            name: title,
-            item: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-          });
-        } else {
-          items.push({
-            '@type': 'ListItem',
-            position: 2,
-            name: title,
-            item: canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString(),
-          });
-        }
-        return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
-      })())}
-    />
-    <style>
-      :root {
-        --toc-scroll-offset: 112px;
+    <script type="application/ld+json" set:html={JSON.stringify((() => {
+      const isBlogPath = Astro.url.pathname.startsWith('/blog/');
+      const items = [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).toString() },
+      ];
+      if (isBlogPath) {
+        items.push({ '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/blog/', Astro.site).toString() });
+        items.push({ '@type': 'ListItem', position: 3, name: title, item: (canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString()) });
+      } else {
+        items.push({ '@type': 'ListItem', position: 2, name: title, item: (canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).toString()) });
       }
-
+      return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
+    })())} />
+    <style>
       main {
         width: 1280px;
         max-width: calc(100% - 2em);
         margin: auto;
         background: var(--color-bg-primary);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
       }
-
-      .hero-image {
+      .content {
         width: 100%;
       }
-
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+        order: -1;
+      }
+      @media (min-width: 768px) {
+        main {
+          grid-template-columns: 1fr 300px;
+        }
+        .sidebar {
+          order: 0;
+        }
+      }
+      .toc {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+        background: var(--color-bg-elevated, rgba(22, 22, 22, 0.85));
+        overflow: hidden;
+      }
+      .toc summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0.75rem 1rem;
+        list-style: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+      .toc summary::-webkit-details-marker {
+        display: none;
+      }
+      .toc summary::after {
+        content: '>';
+        display: inline-block;
+        margin-left: 0.5rem;
+        transform: rotate(90deg);
+        transition: transform 0.2s ease;
+      }
+      .toc[open] summary::after {
+        transform: rotate(-90deg);
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0 1rem 1rem;
+        margin: 0;
+      }
+      .toc li {
+        margin-bottom: 0.35rem;
+      }
+      .toc a {
+        display: block;
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        line-height: 1.25;
+        word-break: break-word;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+      .toc .toc-h2 {
+        font-weight: 600;
+        margin-left: 0;
+      }
+      .toc .toc-h3 {
+        margin-left: 0.75rem;
+        font-size: 0.8rem;
+      }
+      @media (max-width: 767px) {
+        .sidebar {
+          position: static;
+          order: -1;
+        }
+        .toc summary {
+          font-size: 1rem;
+        }
+      }
+      @media (min-width: 768px) {
+        .toc summary {
+          cursor: default;
+        }
+      }
+      .hero-image { width: 100%; }
       .hero-image img {
         display: block;
         margin: 0 auto;
         border-radius: 12px;
         box-shadow: var(--box-shadow);
       }
-
-      .article-content {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-        padding: 0 1rem 2rem;
-      }
-
-      article.has-toc .article-content {
-        gap: 1.5rem;
-      }
-
-      @media (min-width: 1024px) {
-        .article-content {
-          padding: 0 2rem 3rem;
-        }
-
-        article.has-toc .article-content {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
-          align-items: start;
-          column-gap: 2.5rem;
-          row-gap: 1rem;
-        }
-
-        article.has-toc .post-body {
-          grid-column: 1;
-          grid-row: 1;
-        }
-
-        article.has-toc .toc-wrapper {
-          grid-column: 2;
-          grid-row: 1;
-          margin-top: 1rem;
-        }
-      }
-
-      .post-body {
+      .prose {
         width: 100%;
         max-width: 870px;
-        margin: 1rem auto 0;
+        margin: auto;
         padding: 0.05em;
         color: var(--color-text-secondary);
       }
-
-      article.has-toc .post-body {
-        margin: 1rem 0 0;
-      }
-
-      .post-body h2,
-      .post-body h3 {
-        scroll-margin-top: var(--toc-scroll-offset);
-      }
-
       .title {
         margin-bottom: 1em;
-        padding: 0.5em 0 1em;
+        padding: 1em 0;
         text-align: center;
         line-height: 1;
       }
-
       .title h1 {
         margin: 0 0 0.5em 0;
         color: var(--color-text-primary);
       }
-
-      .date {
-        margin-bottom: 0.5em;
-        color: var(--color-text-muted);
-      }
-
-      .last-updated-on {
-        font-style: italic;
-      }
-
-      .toc-wrapper {
-        background: var(--color-bg-secondary);
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: var(--box-shadow);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        order: -1;
-      }
-
-      @media (min-width: 640px) {
-        .toc-wrapper {
-          order: initial;
-        }
-      }
-
-      @media (min-width: 1024px) {
-        .toc-wrapper {
-          position: sticky;
-          top: calc(var(--toc-scroll-offset) - 16px);
-          max-height: calc(100vh - var(--toc-scroll-offset));
-          overflow: auto;
-        }
-      }
-
-      .toc-title {
-        font-size: 0.75rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--color-text-primary);
-      }
-
-      .toc-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 0.5rem;
-      }
-
-      .toc-item.level-3 {
-        padding-left: 1rem;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      .toc-link {
-        display: inline-block;
-        color: var(--color-text-secondary);
-        text-decoration: none;
-        font-size: 0.95rem;
-        line-height: 1.4;
-        transition: color 0.2s ease, transform 0.2s ease;
-      }
-
-      .toc-link:hover,
-      .toc-link:focus-visible {
-        color: var(--accent, #70b3ff);
-      }
-
-      .toc-link.is-active {
-        color: var(--color-text-primary);
-        font-weight: 600;
-      }
-
-      .toc-link.is-active::before {
-        content: '•';
-        margin-right: 0.5rem;
-        color: var(--accent, #70b3ff);
-      }
-
-      .toc-wrapper::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .toc-wrapper::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 999px;
-      }
+      .date { margin-bottom: 0.5em; color: var(--color-text-muted); }
+      .last-updated-on { font-style: italic; }
     </style>
   </head>
 
   <body>
     <Header />
-    <main>
-      <article class:list={{ 'has-toc': hasToc }}>
-        {showHeader && (
-          <div class="hero-image">
-            {heroImageIsAsset ? (
-            <Image width={1020} height={510} src={heroImage} alt="" />
-          ) : heroImageSrc ? (
-            <img width="1020" height="510" src={heroImageSrc} alt="" loading="lazy" />
-          ) : null}
-          </div>
-        )}
-
-        <div class:list={{ 'article-content': true, 'with-toc': hasToc }}>
-          {hasToc && (
-            <aside class="toc-wrapper" aria-label="Table of contents">
-              <span class="toc-title">Contents</span>
-              <ul class="toc-list">
-                {(toc ?? []).map((item) => (
-                  <li class={`toc-item level-${item.level}`}>
-                    <a class="toc-link" href={`#${item.id}`} data-toc-target={item.id}>
-                      {item.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </aside>
+    <main id="top">
+      <div class="content">
+        <article>
+          {showHeader && (
+            <div class="hero-image">
+              {heroImage && <img src={heroImage} alt="" width="1020" height="510" />}
+            </div>
           )}
-
-          <div class:list={{ 'post-body': true, prose: true }}>
+          <div class="prose">
             {showHeader && (
               <div class="title">
                 <div class="date">
@@ -332,123 +234,135 @@ const heroImageUrl = heroImageSrc ? new URL(heroImageSrc, Astro.site).toString()
                 <hr />
               </div>
             )}
-
-            <ShareButtons title={title} url={Astro.url.toString()} />
-            <PostMeta
-              pubDate={pubDate}
-              readingTimeMin={readingTimeMin}
-              authorName={Astro.props.author || 'Site Author'}
-            />
-
+            <PostMeta pubDate={pubDate} readingTimeMin={readingTimeMin} authorName={'Site Author'} />
             <slot />
             <PostNav prev={prevPost} next={nextPost} />
           </div>
-        </div>
-
-        {hasToc && (
-          <script type="module" is:inline>
-            const article = document.currentScript?.parentElement;
-            if (!article) {
-              return;
-            }
-            const postBody = article.querySelector('.post-body');
-            const tocLinks = Array.from(article.querySelectorAll('.toc-wrapper .toc-link'));
-            if (!postBody || tocLinks.length === 0) {
-              return;
-            }
-
-            const items = tocLinks
-              .map((link) => {
-                const targetId = link.dataset.tocTarget || link.getAttribute('href')?.slice(1);
-                if (!targetId) return null;
-                const target = document.getElementById(targetId);
-                if (!target || !postBody.contains(target)) return null;
-                return { id: targetId, link, heading: target };
-              })
-              .filter(Boolean);
-
-            if (items.length === 0) {
-              return;
-            }
-
-            const prefersReducedMotion =
-              window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-
-            const setActive = (id) => {
-              items.forEach(({ id: itemId, link }) => {
-                const isActive = itemId === id;
-                link.classList.toggle('is-active', isActive);
-                if (isActive) {
-                  link.setAttribute('aria-current', 'true');
-                } else {
-                  link.removeAttribute('aria-current');
-                }
-              });
-            };
-
-            const ensureVisibleFallback = () => {
-              const scrollPosition = window.scrollY + 140;
-              let current = items[0];
-              for (const item of items) {
-                if (item.heading.offsetTop <= scrollPosition) {
-                  current = item;
-                } else {
-                  break;
-                }
-              }
-              setActive(current.id);
-            };
-
-            tocLinks.forEach((link) => {
-              link.addEventListener('click', (event) => {
-                const targetId = link.dataset.tocTarget || link.getAttribute('href')?.slice(1);
-                if (!targetId) return;
-                const targetItem = items.find(({ id }) => id === targetId);
-                if (!targetItem) return;
-                event.preventDefault();
-                targetItem.heading.scrollIntoView({
-                  behavior: prefersReducedMotion ? 'auto' : 'smooth',
-                  block: 'start',
-                });
-                history.replaceState(null, '', '#' + targetId);
-                setActive(targetId);
-              });
-            });
-
-            if ('IntersectionObserver' in window) {
-              const observer = new IntersectionObserver(
-                (entries) => {
-                  let updated = false;
-                  entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                      setActive(entry.target.id);
-                      updated = true;
-                    }
-                  });
-                  if (!updated) {
-                    ensureVisibleFallback();
-                  }
-                },
-                {
-                  rootMargin: '-45% 0px -40% 0px',
-                  threshold: [0, 0.4, 0.75],
-                }
-              );
-              items.forEach(({ heading }) => observer.observe(heading));
-            } else {
-              ensureVisibleFallback();
-            }
-
-            const hashTarget = decodeURIComponent(window.location.hash.slice(1));
-            if (hashTarget) {
-              setActive(hashTarget);
-            } else {
-              ensureVisibleFallback();
-            }
-          </script>
-        )}
-      </article>
+        </article>
+      </div>
+      <aside class="sidebar">
+        <details class="toc" data-auto-toggle open>
+          <summary>Contents</summary>
+          <ul id="toc-list"></ul>
+        </details>
+      </aside>
     </main>
     <Footer />
-  </body>
-</html>
+
+    <!-- Lightbox script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const images = document.querySelectorAll('.prose img');
+        images.forEach(img => {
+          (img as HTMLElement).style.cursor = 'pointer';
+          img.addEventListener('click', () => {
+            const lightbox = document.createElement('div');
+            lightbox.style.position = 'fixed';
+            lightbox.style.top = '0';
+            lightbox.style.left = '0';
+            lightbox.style.width = '100%';
+            lightbox.style.height = '100%';
+            lightbox.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            lightbox.style.display = 'flex';
+            lightbox.style.alignItems = 'center';
+            lightbox.style.justifyContent = 'center';
+            lightbox.style.zIndex = '1000';
+            lightbox.addEventListener('click', () => {
+              document.body.removeChild(lightbox);
+            });
+
+            const imgClone = img.cloneNode(true) as HTMLElement;
+            (imgClone as HTMLElement).style.maxWidth = '90%';
+            (imgClone as HTMLElement).style.maxHeight = '90%';
+            (imgClone as HTMLElement).style.objectFit = 'contain';
+            lightbox.appendChild(imgClone);
+
+            document.body.appendChild(lightbox);
+          });
+        });
+      });
+    </script>
+
+    <!-- TOC script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const tocDetails = document.querySelector('.toc');
+        const tocList = document.getElementById('toc-list');
+        const desktopQuery = window.matchMedia('(min-width: 768px)');
+
+        const applyMediaState = () => {
+          if (!(tocDetails instanceof HTMLDetailsElement)) {
+            return;
+          }
+          if (desktopQuery.matches) {
+            tocDetails.setAttribute('open', '');
+            delete tocDetails.dataset.manualOpen;
+          } else if (!tocDetails.dataset.manualOpen) {
+            tocDetails.removeAttribute('open');
+          }
+        };
+
+        if (tocDetails instanceof HTMLDetailsElement) {
+          applyMediaState();
+
+          const onMediaChange = () => applyMediaState();
+          if (typeof desktopQuery.addEventListener === 'function') {
+            desktopQuery.addEventListener('change', onMediaChange);
+          } else if (typeof desktopQuery.addListener === 'function') {
+            desktopQuery.addListener(onMediaChange);
+          }
+
+          tocDetails.addEventListener('toggle', () => {
+            if (desktopQuery.matches) {
+              tocDetails.setAttribute('open', '');
+              return;
+            }
+            if (tocDetails.open) {
+              tocDetails.dataset.manualOpen = 'true';
+            } else {
+              delete tocDetails.dataset.manualOpen;
+            }
+          });
+        }
+
+        if (tocList) {
+          const topLi = document.createElement('li');
+          const topA = document.createElement('a');
+          topA.href = '#top';
+          topA.textContent = 'Back to top';
+          topA.className = 'toc-h2';
+          topLi.appendChild(topA);
+          tocList.appendChild(topLi);
+
+          const headers = document.querySelectorAll('.prose h2, .prose h3');
+          headers.forEach((header) => {
+            if (!(header instanceof HTMLElement)) {
+              return;
+            }
+            if (!header.id) {
+              const slug = header.textContent
+                ? header.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+                : '';
+              if (slug) {
+                header.id = slug;
+              }
+            }
+            if (!header.id) {
+              return;
+            }
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + header.id;
+            a.textContent = header.textContent ?? '';
+            a.className = header.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+            li.appendChild(a);
+            tocList.appendChild(li);
+          });
+        }
+      });
+    </script>
+
+
+
+
+

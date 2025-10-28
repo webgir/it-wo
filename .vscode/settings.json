@@ -1,0 +1,30 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "emmet.includeLanguages": {
+    "astro": "html"
+  },
+  "files.associations": {
+    "*.astro": "astro"
+  },
+  "astro.validate": true,
+  "tailwindCSS.includeLanguages": {
+    "astro": "HTML"
+  },
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "cline.modelSettings": {
+    "model": "ollama/qwen2.5:14b-instruct",
+    "apiBase": "http://localhost:11434"
+  }
+}

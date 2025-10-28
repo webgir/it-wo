@@ -19,7 +19,29 @@ import GlowLineSeparator from '../components/ui/separator/GlowLineSeparator.astr
 <!doctype html>
 <html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} image={undefined} />
+    
+    <!-- JSON-LD: WebSite Schema -->
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE_TITLE,
+        url: Astro.site,
+        description: SITE_DESCRIPTION,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${Astro.site}blog?search={search_term_string}`
+          },
+          'query-input': 'required name=search_term_string'
+        }
+      })}
+    />
+    
     <!-- JSON-LD: Organization -->
     <script
       type="application/ld+json"
@@ -27,7 +49,7 @@ import GlowLineSeparator from '../components/ui/separator/GlowLineSeparator.astr
       set:html={JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'Site Author',
+        name: 'IT-WO',
         url: new URL('/', Astro.site).toString(),
         logo: new URL('/favicon.svg', Astro.site).toString(),
         sameAs: [

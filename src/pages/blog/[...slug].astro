@@ -1,22 +1,21 @@
 ﻿---
 import { getCollection } from 'astro:content';
+import { slugifyTag } from '../../lib/slug';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  // Импортируем функцию транслитерации
-  const { slugifyTag } = await import('../../lib/slug');
   return posts.map((post) => {
-    const categoryRaw = String(post.data.category ?? 'notes');
-    const rawSlug = (post.data.slug ?? post.id).replace(/^.*\//,'').replace(/\.(md|mdx)$/,'');
-    const slug = slugifyTag(rawSlug);
+    const rawSlug = (post.data.slug ?? post.id.replace(/^.*\//,'').replace(/\.(md|mdx)$/,''));
+    const normalizedSlug = slugifyTag(rawSlug);
     return {
-      params: { slug },
+      params: { slug: normalizedSlug },
       props: {
-        target: `/blog/${encodeURIComponent(categoryRaw)}/${encodeURIComponent(rawSlug)}/`,
+        target: `/blog/${slugifyTag(post.data.category ?? 'notes')}/${normalizedSlug}/`,
       },
     };
   });
 }
 
-return Astro.redirect(Astro.props.target as string, 301);
+const { target } = Astro.props;
+return Astro.redirect(target, 301);
 ---

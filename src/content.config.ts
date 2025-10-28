@@ -6,12 +6,13 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     pubDate: z.any().optional(),
+    updatedDate: z.any().optional(),
     category: z.string().optional(),
     tags: z.array(z.string()).optional(),
-  heroImage: z.string().optional(),
-  draft: z.boolean().optional(),
-  slug: z.string().optional(),
-  author: z.string().optional(),
+    slug: z.string().optional(),
+    heroImage: z.string().optional(),
+    author: z.string().optional(),
+    draft: z.boolean().optional(),
     // оставь прочие поля как у тебя было, все optional
   }),
 });

@@ -42,7 +42,7 @@ const pagePosts = rest.slice(start, start + PAGE_SIZE);
 
 <html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={`Блог — страница ${pageNum}`} description={`Страница ${pageNum} блога: новые записи по дате.`} />
+    <BaseHead title={`Блог — страница ${pageNum}`} description={`Страница ${pageNum} блога: новые записи по дате.`} image={undefined} />
     {pageNum < totalPages && <link rel="next" href={`/blog/page/${pageNum + 1}/`} />}
     {pageNum === 2 && <link rel="prev" href={`/blog/`} />}
     {pageNum > 2 && <link rel="prev" href={`/blog/page/${pageNum - 1}/`} />}

@@ -1,4 +1,5 @@
-﻿---
+---
+import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../../FormattedDate.astro';
 import { calculateReadingTimeFromMarkdown } from '../../../lib/reading';
@@ -15,8 +16,9 @@ const baseSlug = ((post as any).slug ?? post.id)
 // итоговый slug с приоритетом фронтматтера
 const s = post.data.slug ?? baseSlug;
 // категория (дефолт — 'notes', чтобы ничего не падало)
-// финальный href в формате /{slug}/
-const href = `/${slugify(s)}/`;
+const cat = post.data.category ?? 'notes';
+// финальный href в формате /blog/<category>/<slug>/
+const href = `/blog/${cat}/${s}/`;
 
 // Оценка времени чтения по сырому Markdown/MDX
 let readingTimeMin = 0;
@@ -28,10 +30,18 @@ try {
 
 <article class="card-surface p-4 h-full flex flex-col gap-3 relative">
   {post.data.heroImage && (
-    <img width="640" height="360" src={post.data.heroImage} alt={post.data.title} loading="lazy" style="object-fit:cover;width:100%;height:auto;border-radius:0.75rem;" />
+    <Image 
+      width={640} 
+      height={360} 
+      src={post.data.heroImage} 
+      alt={post.data.title}
+      loading="lazy"
+      format="webp"
+      quality={80}
+    />
   )}
-  <h3 class="text-lg font-semibold text-[color:var(--color-text-primary)]">{post.data.title}</h3>
-  <p class="text-[color:var(--color-text-muted)]">{post.data.description}</p>
+  <h3 class="text-xl font-semibold text-[color:var(--color-text-primary)]">{post.data.title}</h3>
+  <p class="text-sm text-[color:var(--color-text-muted)]">{post.data.description}</p>
   
   <div class="flex flex-col text-sm text-[color:var(--color-text-muted)] gap-1">
     <div class="flex items-center gap-1">
@@ -56,7 +66,7 @@ try {
   {post.data.tags && post.data.tags.length > 0 && (
     <div class="flex gap-2 flex-wrap">
       {post.data.tags.map((t) => (
-        <a href={`/tag/${slugify(t)}/`} class="sw-tag interactive-link">{t}</a>
+        <a href={`/tag/${t.replace(/\s+/g,'-').toLowerCase()}/`} class="sw-tag interactive-link">{t}</a>
       ))}
     </div>
   )}

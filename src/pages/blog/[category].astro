@@ -7,14 +7,14 @@ import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
-  const { slugifyTag } = await import('../../lib/slug');
   const categories = Array.from(
     new Set(
       posts
-        .map(p => slugifyTag(String(p.data.category ?? '').trim()))
+        .map(p => String(p.data.category ?? '').trim())
         .filter(Boolean)
     )
   );
+  // Генерируем пути как есть (кириллица/пробелы допустимы; браузер закодирует)
   return categories.map((category) => ({
     params: { category },
   }));
@@ -28,13 +28,13 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && String(d
 
 // Если в категории нет статей — 404 (можно заменить на мягкое сообщение)
 if (!posts.length) {
-  return new Response('Not found', { status: 404 });
+  return Astro.response(new Response('Not found', { status: 404 }));
 }
 ---
 
 <html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={`Блог — ${category}`} description={`Статьи категории «${category}».`} />
+    <BaseHead title={`Блог — ${category}`} description={`Статьи категории «${category}».`} image={undefined} />
   </head>
   <body>
     <Header />

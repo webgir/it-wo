@@ -36,7 +36,7 @@ const meta = getCategoryMeta(category) ?? {
 ---
 <html lang="ru" data-theme="dark" class="dark">
   <head>
-    <BaseHead title={`${meta.title}`} description={meta.description} />
+    <BaseHead title={`${meta.title}`} description={meta.description} image={undefined} />
     <link rel="alternate" type="application/rss+xml" title={`Category: ${category} feed`} href={`/rss/category/${category}.xml`} />
   </head>
   <body>

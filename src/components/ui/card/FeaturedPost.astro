@@ -25,7 +25,16 @@ const href = `/blog/${categoryPath}/${slugPath}/`;
   {post.data.heroImage && (
     <div class="md:col-span-1 relative overflow-hidden rounded-lg">
       <div class="aspect-[16/9] w-full min-h-featured">
-        <Image class="w-full h-full object-cover" width={1200} height={630} src={post.data.heroImage} alt={post.data.title} />
+        <Image 
+          class="w-full h-full object-cover" 
+          width={1200} 
+          height={630} 
+          src={post.data.heroImage} 
+          alt={post.data.title}
+          loading="eager"
+          format="webp"
+          quality={85}
+        />
       </div>
     </div>
   )}
@@ -34,7 +43,7 @@ const href = `/blog/${categoryPath}/${slugPath}/`;
       <span class="sw-tag border border-[color:var(--color-border-light)]"><span class="text-[color:var(--accent)]">★</span> Избранное</span>
     </div>
     <h3 class="text-xl md:text-2xl font-bold text-[color:var(--color-text-primary)]">{post.data.title}</h3>
-    {post.data.description && <p class="text-[color:var(--color-text-secondary)]">{post.data.description}</p>}
+    {post.data.description && <p class="text-sm text-[color:var(--color-text-secondary)]">{post.data.description}</p>}
     <div class="flex items-center gap-3 text-sm text-[color:var(--color-text-muted)]">
       <FormattedDate date={post.data.pubDate} />
       <span>•</span>

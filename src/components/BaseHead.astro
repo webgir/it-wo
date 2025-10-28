@@ -7,30 +7,29 @@ import { SITE_TITLE } from '../consts';
 
 interface Props {
   title: string;
-  description?: string;
-  image?: ImageMetadata | string;
+  description: string;
+  image?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const absoluteUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const siteOrigin = Astro.site ?? new URL(Astro.url).origin;
 
-const { title, description = '', image } = Astro.props as Props;
-const resolvedImage = image ?? FallbackImage;
-const resolvedSrc = typeof resolvedImage === 'string' ? resolvedImage : resolvedImage.src;
-const imageUrl = new URL(resolvedSrc, siteOrigin).toString();
+const { title, description, image } = Astro.props;
+const imageUrl = image || new URL(FallbackImage.src, siteOrigin).toString();
 const YM_ID = Number(import.meta.env.PUBLIC_YM_ID || 104544855); // положи свой ID в .env
 const IS_PROD = import.meta.env.PROD;
-const HAS_YM = Number.isFinite(YM_ID) && YM_ID > 0;
 
 ---
 
 <!-- Глобальные метаданные -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=1" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=1" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1" />
-<link rel="icon" type="image/png" href="/favicon.png" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" href="/favicon.png?v=1" />
+<link rel="shortcut icon" href="/favicon.ico?v=1" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
   rel="alternate"
@@ -41,8 +40,8 @@ const HAS_YM = Number.isFinite(YM_ID) && YM_ID > 0;
 <meta name="generator" content={Astro.generator} />
 
 <!-- Предзагрузка шрифтов -->
-<link rel="preload" href="/fonts/Web-TT/Stara-Medium.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" href="/fonts/Web-TT/Stara-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
+<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
 
 <!-- Канонический URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -78,37 +77,18 @@ const HAS_YM = Number.isFinite(YM_ID) && YM_ID > 0;
 <meta property="twitter:image" content={imageUrl} />
 
 
-{HAS_YM && IS_PROD && (
-  <>
-    <!-- Yandex.Metrika counter -->
-    <script is:inline define:vars={{ YM_ID }}>
-      (function (m, e, t, r, i, k, a) {
-        m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-        m[i].l = 1 * new Date();
-        for (let j = 0; j < document.scripts.length; j++) {
-          if (document.scripts[j].src === r) { return; }
-        }
-        k = e.createElement(t);
-        a = e.getElementsByTagName(t)[0];
-        k.async = 1;
-        k.src = r;
-        a.parentNode.insertBefore(k, a);
-      })(window, document, 'script', `https://mc.yandex.ru/metrika/tag.js?id=${YM_ID}`, 'ym');
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104544855', 'ym');
 
-      ym(YM_ID, 'init', {
-        ssr: true,
-        webvisor: true,
-        clickmap: true,
-        ecommerce: 'dataLayer',
-        accurateTrackBounce: true,
-        trackLinks: true
-      });
-    </script>
-    <noscript>
-      <div>
-        <img src={`https://mc.yandex.ru/watch/${YM_ID}`} style="position:absolute; left:-9999px;" alt="" />
-      </div>
-    </noscript>
-    <!-- /Yandex.Metrika counter -->
-  </>
-)}
+    ym(104544855, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/104544855" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+

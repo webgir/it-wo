@@ -4,12 +4,10 @@ export type CategoryMeta = {
   description: string;
 };
 
+import { slugifyTag } from '../lib/slug';
+
 function toSlug(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-');
+  return slugifyTag(input);
 }
 
 function toTitleFromSlug(slug: string): string {
