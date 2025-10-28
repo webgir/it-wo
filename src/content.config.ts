@@ -17,4 +17,20 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+const articles = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.string(), // храним как ISO-строку, не Date
+    category: z.enum(['web','ai','infrastructure','culture','method']),
+    type: z.enum(['experiment','tutorial','note','method','essay']),
+    tags: z.array(z.string()).default([]),
+    lang: z.string().default('ru'),
+    status: z.enum(['draft','review','published']).default('draft'),
+    summary: z.string().max(250),
+    version: z.number().default(1),
+    id: z.string(),
+  })
+});
+
+export const collections = { blog, articles };

@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/BlogPost.astro';
+import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
+
+const pageTitle = 'Студия и экосистема';
+const pageDescription = 'it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. Вместе это не сайт, а живая система.';
+---
+
+<Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
+  <h1>Студия и экосистема</h1>
+  
+  <p>
+    it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. 
+    Вместе это не сайт, а живая система.
+  </p>
+
+  <GlowLineSeparator />
+
+  <h2>it-wo: исследование и метод</h2>
+  <p>
+    Здесь будет описание it-wo как лаборатории мысли, исследовательской площадки и методологической базы.
+  </p>
+
+  <GlowLineSeparator />
+
+  <h2>Mirare: визуальный слой и образ</h2>
+  <p>
+    Здесь будет описание Mirare как визуального отражения студийной работы, эстетического проекта и цифрового искусства.
+  </p>
+
+  <GlowLineSeparator />
+
+  <h2>NAS + n8n: автоматизация и поток</h2>
+  <p>
+    Здесь будет описание инфраструктуры автоматизации: как NAS и n8n формируют операционную среду для обработки данных и процессов.
+  </p>
+
+  <GlowLineSeparator />
+
+  <h2>Obsidian: память и навигация идей</h2>
+  <p>
+    Здесь будет описание Obsidian как операционной памяти студии, системы навигации по знаниям и связям между идеями.
+  </p>
+
+  <GlowLineSeparator />
+</Layout>
