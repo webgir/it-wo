@@ -1,9 +1,19 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
 import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
+import { getCollection } from 'astro:content';
 
 const pageTitle = 'Студия и экосистема';
 const pageDescription = 'it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. Вместе это не сайт, а живая система.';
+
+// Получаем материалы студии
+const studioEntries = await getCollection('studio');
+const cycleArticles = studioEntries
+  .filter(entry => entry.data.cycle && entry.data.cycle.length > 0)
+  .sort((a, b) => {
+    const typeOrder: Record<string, number> = { 'concept': 1, 'experiment': 2, 'form': 3 };
+    return (typeOrder[a.data.type] || 99) - (typeOrder[b.data.type] || 99);
+  });
 ---
 
 <Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
@@ -13,6 +23,28 @@ const pageDescription = 'it-wo — лаборатория мысли. Mirare —
     it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. 
     Вместе это не сайт, а живая система.
   </p>
+
+  <GlowLineSeparator />
+
+  <h2>Цикл: мысль → тест → форма</h2>
+  <p>
+    Основной метод студии — цикл совместного мышления человека и ИИ, где идея проходит три стадии:
+  </p>
+  
+  {cycleArticles.length > 0 ? (
+    <ul class="cycle-list">
+      {cycleArticles.map((entry) => (
+        <li>
+          <strong>{entry.data.type === 'concept' ? '1. Мысль' : entry.data.type === 'experiment' ? '2. Тест' : '3. Форма'}</strong> — 
+          {entry.data.title}
+          <br />
+          <span class="summary">{entry.data.summary}</span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p><em>Материалы цикла в процессе создания...</em></p>
+  )}
 
   <GlowLineSeparator />
 
@@ -44,3 +76,33 @@ const pageDescription = 'it-wo — лаборатория мысли. Mirare —
 
   <GlowLineSeparator />
 </Layout>
+
+<style>
+  .cycle-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+  }
+  
+  .cycle-list li {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(var(--color-primary-rgb), 0.05);
+    border-left: 3px solid rgb(var(--color-primary-rgb));
+    border-radius: 0.25rem;
+  }
+  
+  .cycle-list strong {
+    color: rgb(var(--color-primary-rgb));
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cycle-list .summary {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9em;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+</style>
