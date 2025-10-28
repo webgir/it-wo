@@ -39,7 +39,7 @@ const studio = defineCollection({
     title: z.string(),
     date: z.string(),
     category: z.string(),
-    type: z.enum(['concept','experiment','tutorial','note','method','essay']),
+    type: z.enum(['concept','experiment','form','tutorial','note','method','essay']),
     cycle: z.array(z.string()).optional(),
     tags: z.array(z.string()).default([]),
     lang: z.string().default('ru'),
