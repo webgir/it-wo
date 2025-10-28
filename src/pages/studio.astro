@@ -1,108 +1,112 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
 import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
-import { getCollection } from 'astro:content';
+import { getCurrentCycle } from '@/lib/studioCycle';
 
 const pageTitle = 'Студия и экосистема';
 const pageDescription = 'it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. Вместе это не сайт, а живая система.';
 
-// Получаем материалы студии
-const studioEntries = await getCollection('studio');
-const cycleArticles = studioEntries
-  .filter(entry => entry.data.cycle && entry.data.cycle.length > 0)
-  .sort((a, b) => {
-    const typeOrder: Record<string, number> = { 'concept': 1, 'experiment': 2, 'form': 3 };
-    return (typeOrder[a.data.type] || 99) - (typeOrder[b.data.type] || 99);
-  });
+// Получаем текущий цикл студии
+const cycle = await getCurrentCycle();
 ---
 
 <Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
-  <h1>Студия и экосистема</h1>
-  
-  <p>
-    it-wo — лаборатория мысли. Mirare — визуальное отражение. NAS, n8n и Obsidian — операционная среда. 
-    Вместе это не сайт, а живая система.
-  </p>
+  <section class="prose prose-invert max-w-none mb-8">
+    <h1 class="text-3xl font-semibold">Студия и экосистема</h1>
+    <p class="text-base text-neutral-400">
+      it-wo — пространство, где создаётся и документируется процесс взаимодействия человека и искусственного интеллекта.
+      Это не отчёт о готовых продуктах. Это наблюдаемый процесс мышления.
+    </p>
+  </section>
 
   <GlowLineSeparator />
 
-  <h2>Цикл: мысль → тест → форма</h2>
-  <p>
-    Основной метод студии — цикл совместного мышления человека и ИИ, где идея проходит три стадии:
-  </p>
-  
-  {cycleArticles.length > 0 ? (
-    <ul class="cycle-list">
-      {cycleArticles.map((entry) => (
-        <li>
-          <strong>{entry.data.type === 'concept' ? '1. Мысль' : entry.data.type === 'experiment' ? '2. Тест' : '3. Форма'}</strong> — 
-          {entry.data.title}
-          <br />
-          <span class="summary">{entry.data.summary}</span>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p><em>Материалы цикла в процессе создания...</em></p>
-  )}
+  <section class="mb-12">
+    <h2 class="text-xl font-medium mb-6 text-neutral-200">Текущий цикл студии</h2>
+    <p class="text-sm text-neutral-400 mb-6">
+      Цикл «мысль → тест → форма» — основной метод работы студии, где идея проходит путь от концепции до воплощения.
+    </p>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      {cycle.idea && (
+        <a 
+          class="block rounded-xl border border-neutral-700 p-6 hover:bg-neutral-800/40 hover:border-neutral-600 transition-all duration-200"
+          href={`/studio/${cycle.idea.id}`}
+        >
+          <div class="text-xs uppercase tracking-wider text-neutral-500 mb-3">мысль</div>
+          <div class="text-lg font-medium text-neutral-100 mb-3 leading-tight">{cycle.idea.title}</div>
+          <div class="text-sm text-neutral-400 leading-relaxed mb-4">{cycle.idea.summary}</div>
+          <div class="text-[11px] text-neutral-500">{cycle.idea.date}</div>
+        </a>
+      )}
+
+      {cycle.test && (
+        <a 
+          class="block rounded-xl border border-neutral-700 p-6 hover:bg-neutral-800/40 hover:border-neutral-600 transition-all duration-200"
+          href={`/studio/${cycle.test.id}`}
+        >
+          <div class="text-xs uppercase tracking-wider text-neutral-500 mb-3">тест</div>
+          <div class="text-lg font-medium text-neutral-100 mb-3 leading-tight">{cycle.test.title}</div>
+          <div class="text-sm text-neutral-400 leading-relaxed mb-4">{cycle.test.summary}</div>
+          <div class="text-[11px] text-neutral-500">{cycle.test.date}</div>
+        </a>
+      )}
+
+      {cycle.form && (
+        <a 
+          class="block rounded-xl border border-neutral-700 p-6 hover:bg-neutral-800/40 hover:border-neutral-600 transition-all duration-200"
+          href={`/studio/${cycle.form.id}`}
+        >
+          <div class="text-xs uppercase tracking-wider text-neutral-500 mb-3">форма</div>
+          <div class="text-lg font-medium text-neutral-100 mb-3 leading-tight">{cycle.form.title}</div>
+          <div class="text-sm text-neutral-400 leading-relaxed mb-4">{cycle.form.summary}</div>
+          <div class="text-[11px] text-neutral-500">{cycle.form.date}</div>
+        </a>
+      )}
+    </div>
+
+    {(!cycle.idea && !cycle.test && !cycle.form) && (
+      <p class="text-neutral-500 text-center py-8">
+        Материалы цикла в процессе создания...
+      </p>
+    )}
+  </section>
 
   <GlowLineSeparator />
 
-  <h2>it-wo: исследование и метод</h2>
-  <p>
-    Здесь будет описание it-wo как лаборатории мысли, исследовательской площадки и методологической базы.
-  </p>
+  <section class="mb-12">
+    <h2 class="text-xl font-medium mb-4 text-neutral-200">it-wo: исследование и метод</h2>
+    <p class="text-neutral-400">
+      Здесь будет описание it-wo как лаборатории мысли, исследовательской площадки и методологической базы.
+    </p>
+  </section>
 
   <GlowLineSeparator />
 
-  <h2>Mirare: визуальный слой и образ</h2>
-  <p>
-    Здесь будет описание Mirare как визуального отражения студийной работы, эстетического проекта и цифрового искусства.
-  </p>
+  <section class="mb-12">
+    <h2 class="text-xl font-medium mb-4 text-neutral-200">Mirare: визуальный слой и образ</h2>
+    <p class="text-neutral-400">
+      Здесь будет описание Mirare как визуального отражения студийной работы, эстетического проекта и цифрового искусства.
+    </p>
+  </section>
 
   <GlowLineSeparator />
 
-  <h2>NAS + n8n: автоматизация и поток</h2>
-  <p>
-    Здесь будет описание инфраструктуры автоматизации: как NAS и n8n формируют операционную среду для обработки данных и процессов.
-  </p>
+  <section class="mb-12">
+    <h2 class="text-xl font-medium mb-4 text-neutral-200">NAS + n8n: автоматизация и поток</h2>
+    <p class="text-neutral-400">
+      Здесь будет описание инфраструктуры автоматизации: как NAS и n8n формируют операционную среду для обработки данных и процессов.
+    </p>
+  </section>
 
   <GlowLineSeparator />
 
-  <h2>Obsidian: память и навигация идей</h2>
-  <p>
-    Здесь будет описание Obsidian как операционной памяти студии, системы навигации по знаниям и связям между идеями.
-  </p>
+  <section class="mb-12">
+    <h2 class="text-xl font-medium mb-4 text-neutral-200">Obsidian: память и навигация идей</h2>
+    <p class="text-neutral-400">
+      Здесь будет описание Obsidian как операционной памяти студии, системы навигации по знаниям и связям между идеями.
+    </p>
+  </section>
 
   <GlowLineSeparator />
 </Layout>
-
-<style>
-  .cycle-list {
-    list-style: none;
-    padding: 0;
-    margin: 1.5rem 0;
-  }
-  
-  .cycle-list li {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: rgba(var(--color-primary-rgb), 0.05);
-    border-left: 3px solid rgb(var(--color-primary-rgb));
-    border-radius: 0.25rem;
-  }
-  
-  .cycle-list strong {
-    color: rgb(var(--color-primary-rgb));
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-  
-  .cycle-list .summary {
-    display: block;
-    margin-top: 0.5rem;
-    font-size: 0.9em;
-    opacity: 0.8;
-    line-height: 1.5;
-  }
-</style>
