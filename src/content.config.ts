@@ -33,4 +33,20 @@ const articles = defineCollection({
   })
 });
 
-export const collections = { blog, articles };
+const studio = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+    category: z.string(),
+    type: z.enum(['concept','experiment','tutorial','note','method','essay']),
+    tags: z.array(z.string()).default([]),
+    lang: z.string().default('ru'),
+    status: z.enum(['draft','review','published']).default('draft'),
+    summary: z.string(),
+    version: z.string().default('v1'),
+    id: z.string(),
+  })
+});
+
+export const collections = { blog, articles, studio };
