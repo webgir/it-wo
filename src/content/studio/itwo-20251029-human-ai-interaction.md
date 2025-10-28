@@ -1,6 +1,6 @@
 ---
 title: "Человек и ИИ: процесс взаимодействия"
-date: 2025-10-29
+date: "2025-10-29"
 category: studio
 type: concept
 tags: [ai, cognition, studio, interaction]
