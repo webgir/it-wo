@@ -1,0 +1,56 @@
+---
+import Layout from '../../layouts/BlogPost.astro';
+import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
+import { getCollection } from 'astro:content';
+
+const pageTitle = 'Mirare';
+const pageDescription = 'Визуальное зеркало студии it-wo. Эстетическая экспозиция процесса взаимодействия человека и искусственного интеллекта.';
+
+// Получаем все визуальные артефакты
+const visuals = await getCollection('visuals');
+---
+
+<Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
+  <section class="prose prose-invert max-w-none mb-8">
+    <h1 class="text-3xl font-semibold">Mirare</h1>
+    <p class="text-base text-neutral-400">
+      Визуальное зеркало студии it-wo. Эстетическая экспозиция процесса взаимодействия человека и искусственного интеллекта.
+    </p>
+  </section>
+
+  <GlowLineSeparator />
+
+  {visuals.length > 0 ? (
+    <section class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
+      {visuals.map(({ id, data }) => (
+        <article class="rounded-2xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-200 bg-neutral-900/30">
+          {data.image && (
+            <img 
+              src={data.image} 
+              alt={data.title} 
+              class="aspect-[4/3] object-cover w-full"
+            />
+          )}
+          <div class="p-4">
+            <h2 class="font-semibold text-lg text-neutral-100 mb-2">{data.title}</h2>
+            {data.description && (
+              <p class="text-sm text-neutral-400 mb-2">{data.description}</p>
+            )}
+            {data.cycle && (
+              <span class="text-xs text-neutral-500 uppercase tracking-wider">{data.cycle}</span>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+  ) : (
+    <section class="mb-12">
+      <h2 class="text-xl font-medium mb-4 text-neutral-200">Экспозиция в разработке</h2>
+      <p class="text-neutral-400">
+        Визуальная галерея — отражение того, как идеи из студии превращаются в образы, формы и эстетические объекты.
+      </p>
+    </section>
+  )}
+
+  <GlowLineSeparator />
+</Layout>

@@ -50,4 +50,15 @@ const studio = defineCollection({
   })
 });
 
-export const collections = { blog, articles, studio };
+const visuals = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    cycle: z.string().optional(),
+    image: z.string().optional(),
+    created: z.coerce.date().optional(),
+  }),
+});
+
+export const collections = { blog, articles, studio, visuals };
