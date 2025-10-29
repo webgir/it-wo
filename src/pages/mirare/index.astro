@@ -2,6 +2,7 @@
 import Layout from '../../layouts/BlogPost.astro';
 import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
 import { getCollection } from 'astro:content';
+import '../../styles/mirare.css';
 
 const pageTitle = 'Mirare';
 const pageDescription = 'Визуальное зеркало студии it-wo. Эстетическая экспозиция процесса взаимодействия человека и искусственного интеллекта.';
@@ -22,8 +23,8 @@ const visuals = await getCollection('visuals');
 
   {visuals.length > 0 ? (
     <section class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
-      {visuals.map(({ id, data }) => (
-        <article class="rounded-2xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-200 bg-neutral-900/30">
+      {visuals.map(({ data }) => (
+        <article class="mirare-card rounded-2xl overflow-hidden">
           {data.image && (
             <img 
               src={data.image} 
